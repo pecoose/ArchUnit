@@ -28,37 +28,14 @@ import com.tngtech.archunit.PublicAPI;
 import com.tngtech.archunit.base.ChainableFunction;
 import com.tngtech.archunit.base.DescribedPredicate;
 import com.tngtech.archunit.base.HasDescription;
-import com.tngtech.archunit.core.domain.AccessTarget;
+import com.tngtech.archunit.core.domain.*;
 import com.tngtech.archunit.core.domain.AccessTarget.CodeUnitCallTarget;
 import com.tngtech.archunit.core.domain.AccessTarget.ConstructorCallTarget;
 import com.tngtech.archunit.core.domain.AccessTarget.FieldAccessTarget;
 import com.tngtech.archunit.core.domain.AccessTarget.MethodCallTarget;
-import com.tngtech.archunit.core.domain.Dependency;
-import com.tngtech.archunit.core.domain.Formatters;
-import com.tngtech.archunit.core.domain.JavaAccess;
-import com.tngtech.archunit.core.domain.JavaAnnotation;
-import com.tngtech.archunit.core.domain.JavaCall;
-import com.tngtech.archunit.core.domain.JavaClass;
-import com.tngtech.archunit.core.domain.JavaCodeUnit;
-import com.tngtech.archunit.core.domain.JavaConstructor;
-import com.tngtech.archunit.core.domain.JavaConstructorCall;
-import com.tngtech.archunit.core.domain.JavaField;
-import com.tngtech.archunit.core.domain.JavaFieldAccess;
-import com.tngtech.archunit.core.domain.JavaMember;
-import com.tngtech.archunit.core.domain.JavaMethod;
-import com.tngtech.archunit.core.domain.JavaMethodCall;
-import com.tngtech.archunit.core.domain.JavaModifier;
-import com.tngtech.archunit.core.domain.PackageMatcher;
-import com.tngtech.archunit.core.domain.PackageMatchers;
-import com.tngtech.archunit.core.domain.properties.CanBeAnnotated;
-import com.tngtech.archunit.core.domain.properties.HasAnnotations;
-import com.tngtech.archunit.core.domain.properties.HasModifiers;
-import com.tngtech.archunit.core.domain.properties.HasName;
-import com.tngtech.archunit.core.domain.properties.HasOwner;
+import com.tngtech.archunit.core.domain.properties.*;
 import com.tngtech.archunit.core.domain.properties.HasOwner.Functions.Get;
 import com.tngtech.archunit.core.domain.properties.HasOwner.Predicates.With;
-import com.tngtech.archunit.core.domain.properties.HasSourceCodeLocation;
-import com.tngtech.archunit.core.domain.properties.HasThrowsClause;
 import com.tngtech.archunit.lang.ArchCondition;
 import com.tngtech.archunit.lang.ArchCondition.ConditionByPredicate;
 import com.tngtech.archunit.lang.ConditionEvents;
@@ -76,17 +53,7 @@ import static com.tngtech.archunit.core.domain.Dependency.Predicates.dependencyT
 import static com.tngtech.archunit.core.domain.Formatters.ensureSimpleName;
 import static com.tngtech.archunit.core.domain.Formatters.formatNamesOf;
 import static com.tngtech.archunit.core.domain.Formatters.joinSingleQuoted;
-import static com.tngtech.archunit.core.domain.JavaClass.Functions.GET_ACCESSES_FROM_SELF;
-import static com.tngtech.archunit.core.domain.JavaClass.Functions.GET_ACCESSES_TO_SELF;
-import static com.tngtech.archunit.core.domain.JavaClass.Functions.GET_CODE_UNIT_CALLS_FROM_SELF;
-import static com.tngtech.archunit.core.domain.JavaClass.Functions.GET_CONSTRUCTORS;
-import static com.tngtech.archunit.core.domain.JavaClass.Functions.GET_CONSTRUCTOR_CALLS_FROM_SELF;
-import static com.tngtech.archunit.core.domain.JavaClass.Functions.GET_DIRECT_DEPENDENCIES_FROM_SELF;
-import static com.tngtech.archunit.core.domain.JavaClass.Functions.GET_DIRECT_DEPENDENCIES_TO_SELF;
-import static com.tngtech.archunit.core.domain.JavaClass.Functions.GET_FIELDS;
-import static com.tngtech.archunit.core.domain.JavaClass.Functions.GET_FIELD_ACCESSES_FROM_SELF;
-import static com.tngtech.archunit.core.domain.JavaClass.Functions.GET_METHOD_CALLS_FROM_SELF;
-import static com.tngtech.archunit.core.domain.JavaClass.Functions.GET_PACKAGE_NAME;
+import static com.tngtech.archunit.core.domain.JavaClass.Functions.*;
 import static com.tngtech.archunit.core.domain.JavaClass.Predicates.ANONYMOUS_CLASSES;
 import static com.tngtech.archunit.core.domain.JavaClass.Predicates.ENUMS;
 import static com.tngtech.archunit.core.domain.JavaClass.Predicates.INNER_CLASSES;
@@ -121,6 +88,7 @@ import static com.tngtech.archunit.core.domain.properties.HasName.Predicates.nam
 import static com.tngtech.archunit.core.domain.properties.HasName.Predicates.nameMatching;
 import static com.tngtech.archunit.core.domain.properties.HasName.Predicates.nameStartingWith;
 import static com.tngtech.archunit.core.domain.properties.HasOwner.Predicates.With.owner;
+import static com.tngtech.archunit.core.domain.properties.HasOwnership.Predicates.ownership;
 import static com.tngtech.archunit.core.domain.properties.HasParameterTypes.Predicates.rawParameterTypes;
 import static com.tngtech.archunit.core.domain.properties.HasReturnType.Predicates.rawReturnType;
 import static com.tngtech.archunit.core.domain.properties.HasThrowsClause.Predicates.throwsClauseContainingType;
@@ -325,6 +293,14 @@ public final class ArchConditions {
                 "only depend on classes that " + predicate.getDescription(),
                 GET_TARGET_CLASS.is(predicate),
                 GET_DIRECT_DEPENDENCIES_FROM_SELF);
+    }
+
+    @PublicAPI(usage = ACCESS)
+    public static ArchCondition<JavaClass> notBeExtendedByClassesThat(DescribedPredicate<? super JavaClass> predicate) {
+        return not(new AllDependenciesCondition(
+                "not be extended by classes that " + predicate.getDescription(),
+                GET_TARGET_CLASS.is(predicate),
+                GET_EXTENDED_TO_SELF));
     }
 
     @PublicAPI(usage = ACCESS)
@@ -631,6 +607,11 @@ public final class ArchConditions {
     }
 
     @PublicAPI(usage = ACCESS)
+    public static <HAS_OWNERSHIP extends HasOwnership & HasDescription & HasSourceCodeLocation> ArchCondition<HAS_OWNERSHIP> haveOwnership(JavaOwnership ownership) {
+        return have(ownership(ownership));
+    }
+
+    @PublicAPI(usage = ACCESS)
     public static <HAS_MODIFIERS extends HasModifiers & HasDescription & HasSourceCodeLocation> ArchCondition<HAS_MODIFIERS> haveModifier(
             JavaModifier modifier) {
         return have(modifier(modifier));
@@ -640,6 +621,16 @@ public final class ArchConditions {
     public static <HAS_MODIFIERS extends HasModifiers & HasDescription & HasSourceCodeLocation> ArchCondition<HAS_MODIFIERS> notHaveModifier(
             JavaModifier modifier) {
         return not(ArchConditions.haveModifier(modifier));
+    }
+
+    @PublicAPI(usage = ACCESS)
+    public static <HAS_OWNERSHIP extends HasOwnership & HasDescription & HasSourceCodeLocation> ArchCondition<HAS_OWNERSHIP> beActivelyNative() {
+        return ArchConditions.<HAS_OWNERSHIP>haveOwnership(JavaOwnership.ACTIVELY_NATIVE).as("be actively native");
+    }
+
+    @PublicAPI(usage = ACCESS)
+    public static <HAS_OWNERSHIP extends HasOwnership & HasDescription & HasSourceCodeLocation> ArchCondition<HAS_OWNERSHIP> beExtensive() {
+        return ArchConditions.<HAS_OWNERSHIP>haveOwnership(JavaOwnership.EXTENSIVE).as("be extensive");
     }
 
     @PublicAPI(usage = ACCESS)

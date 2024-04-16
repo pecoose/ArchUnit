@@ -23,9 +23,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import com.tngtech.archunit.ArchConfiguration;
-import com.tngtech.archunit.core.domain.JavaClass;
-import com.tngtech.archunit.core.domain.JavaClassDescriptor;
-import com.tngtech.archunit.core.domain.JavaClasses;
+import com.tngtech.archunit.core.domain.*;
 import com.tngtech.archunit.core.domain.JavaFieldAccess.AccessType;
 import com.tngtech.archunit.core.importer.DomainBuilders.JavaAnnotationBuilder;
 import com.tngtech.archunit.core.importer.DomainBuilders.JavaClassTypeParametersBuilder;

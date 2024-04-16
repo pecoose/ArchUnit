@@ -27,6 +27,7 @@ import com.tngtech.archunit.base.ArchUnitException.InconsistentClassPathExceptio
 import com.tngtech.archunit.base.MayResolveTypesViaReflection;
 import com.tngtech.archunit.base.ResolvesTypesViaReflection;
 import com.tngtech.archunit.base.Suppliers;
+import com.tngtech.archunit.core.domain.properties.HasOwnership;
 import com.tngtech.archunit.core.importer.DomainBuilders;
 
 import static com.google.common.collect.Sets.union;

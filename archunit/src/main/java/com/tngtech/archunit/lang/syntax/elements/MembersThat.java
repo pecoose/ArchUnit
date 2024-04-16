@@ -32,6 +32,12 @@ import static com.tngtech.archunit.PublicAPI.Usage.ACCESS;
 @PublicAPI(usage = ACCESS)
 public interface MembersThat<CONJUNCTION> {
 
+    @PublicAPI(usage = ACCESS)
+    CONJUNCTION areActivelyNative();
+
+    @PublicAPI(usage = ACCESS)
+    CONJUNCTION areExtensive();
+
     /**
      * Matches members by their name (i.e. field name, method name or {@link JavaConstructor#CONSTRUCTOR_NAME}).
      *

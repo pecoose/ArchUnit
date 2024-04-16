@@ -35,12 +35,7 @@ import com.tngtech.archunit.base.MayResolveTypesViaReflection;
 import com.tngtech.archunit.base.Optionals;
 import com.tngtech.archunit.base.ResolvesTypesViaReflection;
 import com.tngtech.archunit.base.Suppliers;
-import com.tngtech.archunit.core.domain.properties.CanBeAnnotated;
-import com.tngtech.archunit.core.domain.properties.HasAnnotations;
-import com.tngtech.archunit.core.domain.properties.HasModifiers;
-import com.tngtech.archunit.core.domain.properties.HasName;
-import com.tngtech.archunit.core.domain.properties.HasSourceCodeLocation;
-import com.tngtech.archunit.core.domain.properties.HasTypeParameters;
+import com.tngtech.archunit.core.domain.properties.*;
 import com.tngtech.archunit.core.importer.DomainBuilders.JavaClassBuilder;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -72,7 +67,7 @@ import static java.util.stream.Collectors.toSet;
 
 @PublicAPI(usage = ACCESS)
 public final class JavaClass
-        implements JavaType, HasName.AndFullName, HasTypeParameters<JavaClass>, HasAnnotations<JavaClass>, HasModifiers, HasSourceCodeLocation {
+        implements JavaType, HasName.AndFullName, HasTypeParameters<JavaClass>, HasAnnotations<JavaClass>, HasModifiers, HasSourceCodeLocation , HasOwnership {
 
     private final Optional<Source> source;
     private final SourceCodeLocation sourceCodeLocation;
@@ -84,6 +79,7 @@ public final class JavaClass
     private final boolean isRecord;
     private final boolean isAnonymousClass;
     private final boolean isMemberClass;
+    private JavaOwnership ownership;
     private final Set<JavaModifier> modifiers;
     private List<JavaTypeVariable<JavaClass>> typeParameters = emptyList();
     private final Supplier<Class<?>> reflectSupplier;
@@ -139,11 +135,16 @@ public final class JavaClass
         isRecord = builder.isRecord();
         isAnonymousClass = builder.isAnonymousClass();
         isMemberClass = builder.isMemberClass();
+        ownership = builder.getOwnership();
         modifiers = immutableEnumSet(builder.getModifiers());
         reflectSupplier = Suppliers.memoize(new ReflectClassSupplier());
         sourceCodeLocation = SourceCodeLocation.of(this);
         javaPackage = JavaPackage.simple(this);
         completionProcess = builder.isStub() ? CompletionProcess.stub() : CompletionProcess.start();
+    }
+
+    public void setOwnership(JavaOwnership ownership) {
+        this.ownership = ownership;
     }
 
     /**
@@ -340,6 +341,11 @@ public final class JavaClass
     @PublicAPI(usage = ACCESS)
     public boolean isTopLevelClass() {
         return !isNestedClass();
+    }
+
+    @PublicAPI(usage = ACCESS)
+    public JavaOwnership getOwnership() {
+        return this.ownership;
     }
 
     /**
@@ -1508,7 +1514,7 @@ public final class JavaClass
 
     @Override
     public String toString() {
-        return "JavaClass{name='" + descriptor.getFullyQualifiedClassName() + "'}";
+        return "JavaClass{name='" + descriptor.getFullyQualifiedClassName() + ", ownership =" + ownership + "'}";
     }
 
     /**
@@ -2015,6 +2021,23 @@ public final class JavaClass
                     }
                 };
 
+        @PublicAPI(usage = ACCESS)
+        public static final ChainableFunction<JavaClass, Set<Dependency>> GET_EXTENDED_TO_SELF =
+                new ChainableFunction<JavaClass, Set<Dependency>>() {
+                    @Override
+                    public Set<Dependency> apply(JavaClass input) {
+                        Set<Dependency> dependencies = input.getDirectDependenciesToSelf();
+                        Set<Dependency> extendsDependencies = new HashSet<>();
+                        for (Dependency dependency : dependencies) {
+                            // TODO: different type of dependencies
+                            if (dependency.getType() != null && dependency.getType().equals(DependencyType.EXTEND)) {
+                                extendsDependencies.add(dependency);
+                            }
+                        }
+                        return extendsDependencies;
+                    }
+                };
+
         /**
          * @see #getTransitiveDependenciesFromSelf()
          */
@@ -2120,6 +2143,22 @@ public final class JavaClass
             @Override
             public boolean test(JavaClass input) {
                 return input.isMemberClass();
+            }
+        };
+
+        @PublicAPI(usage = ACCESS)
+        public static final DescribedPredicate<JavaClass> ACTIVELY_NATIVE_CLASSES = new DescribedPredicate<JavaClass>("actively native class") {
+            @Override
+            public boolean test(JavaClass input) {
+                return input.getOwnership().equals(JavaOwnership.ACTIVELY_NATIVE);
+            }
+        };
+
+        @PublicAPI(usage = ACCESS)
+        public static final DescribedPredicate<JavaClass> EXTENSIVE_CLASSES = new DescribedPredicate<JavaClass>("extensive class") {
+            @Override
+            public boolean test(JavaClass javaClass) {
+                return javaClass.getOwnership().equals(JavaOwnership.EXTENSIVE);
             }
         };
 

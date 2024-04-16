@@ -37,6 +37,13 @@ import static com.tngtech.archunit.PublicAPI.Usage.ACCESS;
 
 @PublicAPI(usage = ACCESS)
 public interface ClassesThat<CONJUNCTION> {
+
+    @PublicAPI(usage = ACCESS)
+    CONJUNCTION areActivelyNative();
+
+    @PublicAPI(usage = ACCESS)
+    CONJUNCTION areExtensive();
+
     /**
      * Matches classes by their fully qualified class name.
      *

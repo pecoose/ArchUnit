@@ -20,6 +20,8 @@ import java.util.List;
 import com.tngtech.archunit.base.DescribedPredicate;
 import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaCodeUnit;
+import com.tngtech.archunit.core.domain.properties.HasOwner;
+import com.tngtech.archunit.core.domain.properties.HasOwnership;
 import com.tngtech.archunit.core.domain.properties.HasThrowsClause;
 import com.tngtech.archunit.lang.syntax.elements.CodeUnitsThat;
 
@@ -144,5 +146,15 @@ class CodeUnitsThatInternal<
 
     private CONJUNCTION withPredicate(DescribedPredicate<? super CODE_UNIT> predicate) {
         return givenMembers.with(currentPredicate.add(predicate));
+    }
+
+    @Override
+    public CONJUNCTION areActivelyNative() {
+        return withPredicate(SyntaxPredicates.areActivelyNative());
+    }
+
+    @Override
+    public CONJUNCTION areExtensive() {
+        return withPredicate(SyntaxPredicates.areExtensive());
     }
 }

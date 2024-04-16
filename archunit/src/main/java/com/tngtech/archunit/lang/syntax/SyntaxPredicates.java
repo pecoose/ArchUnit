@@ -18,8 +18,11 @@ package com.tngtech.archunit.lang.syntax;
 import com.tngtech.archunit.base.DescribedPredicate;
 import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaModifier;
+import com.tngtech.archunit.core.domain.JavaOwnership;
 import com.tngtech.archunit.core.domain.properties.HasModifiers;
 import com.tngtech.archunit.core.domain.properties.HasName;
+import com.tngtech.archunit.core.domain.properties.HasOwner;
+import com.tngtech.archunit.core.domain.properties.HasOwnership;
 
 import static com.tngtech.archunit.base.DescribedPredicate.doNot;
 import static com.tngtech.archunit.base.DescribedPredicate.not;
@@ -33,6 +36,7 @@ import static com.tngtech.archunit.core.domain.JavaModifier.PROTECTED;
 import static com.tngtech.archunit.core.domain.JavaModifier.PUBLIC;
 import static com.tngtech.archunit.core.domain.JavaModifier.STATIC;
 import static com.tngtech.archunit.core.domain.properties.HasModifiers.Predicates.modifier;
+import static com.tngtech.archunit.core.domain.properties.HasOwnership.Predicates.ownership;
 import static com.tngtech.archunit.core.domain.properties.HasName.Predicates.nameMatching;
 import static com.tngtech.archunit.lang.conditions.ArchConditions.fullyQualifiedName;
 import static com.tngtech.archunit.lang.conditions.ArchPredicates.have;
@@ -52,6 +56,14 @@ class SyntaxPredicates {
 
     static DescribedPredicate<JavaClass> haveSimpleNameNotEndingWith(String suffix) {
         return have(not(simpleNameEndingWith(suffix)).as("simple name not ending with '%s'", suffix));
+    }
+
+    static DescribedPredicate<HasOwnership> areActivelyNative() {
+        return ownership(JavaOwnership.ACTIVELY_NATIVE).as("are activelyNative");
+    }
+
+    static DescribedPredicate<HasOwnership> areExtensive() {
+        return ownership(JavaOwnership.EXTENSIVE).as("are extensive");
     }
 
     static DescribedPredicate<HasModifiers> arePublic() {

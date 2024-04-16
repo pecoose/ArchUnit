@@ -62,8 +62,17 @@ public class Dependency implements HasDescription, Comparable<Dependency>, HasSo
     private final JavaClass originClass;
     private final JavaClass targetClass;
     private final String description;
+    private DependencyType type;
     private final SourceCodeLocation sourceCodeLocation;
     private final int hashCode;
+
+    public DependencyType getType() {
+        return type;
+    }
+
+    public void setType(DependencyType type) {
+        this.type = type;
+    }
 
     private Dependency(JavaClass originClass, JavaClass targetClass, SourceCodeLocation sourceCodeLocation, String description) {
         checkArgument(!originClass.equals(targetClass) || targetClass.isPrimitive(),
@@ -218,7 +227,27 @@ public class Dependency implements HasDescription, Comparable<Dependency>, HasSo
         String dependencyDescription = originDescription + " " + dependencyType + " " + targetDescription;
         String description = dependencyDescription + " in " + sourceCodeLocation;
         dependencies.addAll(asSet(tryCreateDependency(originClass, targetClass, description, sourceCodeLocation)));
-        return dependencies.build();
+        ImmutableSet<Dependency> result = dependencies.build();
+        if (dependencyType.contains("superclass")) {
+            for (Dependency dependency : result) {
+                if (dependency.getType() == null) {
+                    dependency.setType(DependencyType.EXTEND);
+                }
+            }
+        } else if (dependencyType.contains("interface")) {
+            for (Dependency dependency : result) {
+                if (dependency.getType() == null) {
+                    dependency.setType(DependencyType.IMPLEMENT);
+                }
+            }
+        } else {
+            for (Dependency dependency : result) {
+                if (dependency.getType() == null) {
+                    dependency.setType(DependencyType.OTHER);
+                }
+            }
+        }
+        return result;
     }
 
     private static Set<Dependency> createComponentTypeDependencies(

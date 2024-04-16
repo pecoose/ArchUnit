@@ -85,6 +85,16 @@ class ClassesShouldInternal extends ObjectsShouldInternal<JavaClass>
     }
 
     @Override
+    public ClassesShouldConjunction beActivelyNative() {
+        return addCondition(ArchConditions.beActivelyNative());
+    }
+
+    @Override
+    public ClassesShouldConjunction beExtensive() {
+        return addCondition(ArchConditions.beExtensive());
+    }
+
+    @Override
     public ClassesShouldConjunction haveFullyQualifiedName(String name) {
         return addCondition(ArchConditions.haveFullyQualifiedName(name));
     }
@@ -517,6 +527,11 @@ class ClassesShouldInternal extends ObjectsShouldInternal<JavaClass>
     @Override
     public ClassesThat<ClassesShouldConjunction> onlyDependOnClassesThat() {
         return new ClassesThatInternal<>(predicate -> addCondition(ArchConditions.onlyDependOnClassesThat(predicate)));
+    }
+
+    @Override
+    public ClassesThat<ClassesShouldConjunction> notBeExtendedByClassesThat() {
+        return new ClassesThatInternal<>(predicate -> addCondition(ArchConditions.notBeExtendedByClassesThat(predicate)));
     }
 
     @Override

@@ -45,6 +45,12 @@ import static com.tngtech.archunit.PublicAPI.Usage.ACCESS;
 @PublicAPI(usage = ACCESS)
 public interface ClassesShould {
 
+    @PublicAPI(usage = ACCESS)
+    ClassesShouldConjunction beActivelyNative();
+
+    @PublicAPI(usage = ACCESS)
+    ClassesShouldConjunction beExtensive();
+
     /**
      * Asserts that classes have a certain fully qualified class name.
      *
@@ -1118,6 +1124,9 @@ public interface ClassesShould {
      */
     @PublicAPI(usage = ACCESS)
     ClassesThat<ClassesShouldConjunction> onlyDependOnClassesThat();
+
+    @PublicAPI(usage = ACCESS)
+    ClassesThat<ClassesShouldConjunction> notBeExtendedByClassesThat();
 
     /**
      * Asserts that all classes selected by this rule ONLY depend on certain classes (compare {@link #dependOnClassesThat(DescribedPredicate)}).<br>

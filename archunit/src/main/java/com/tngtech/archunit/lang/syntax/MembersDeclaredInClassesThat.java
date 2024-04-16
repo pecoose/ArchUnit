@@ -63,6 +63,16 @@ class MembersDeclaredInClassesThat<MEMBER extends JavaMember, CONJUNCTION extend
     }
 
     @Override
+    public CONJUNCTION areActivelyNative() {
+        return givenWith(SyntaxPredicates.areActivelyNative());
+    }
+
+    @Override
+    public CONJUNCTION areExtensive() {
+        return givenWith(SyntaxPredicates.areExtensive());
+    }
+
+    @Override
     public CONJUNCTION haveFullyQualifiedName(String name) {
         return givenWith(SyntaxPredicates.haveFullyQualifiedName(name));
     }

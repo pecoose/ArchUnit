@@ -1,0 +1,179 @@
+* Annotation
+    * File
+    * called_times
+    * category
+    * commits_count
+    * entity_mapping
+    * id
+    * isIntrusive
+    * is_decoupling
+    * location
+    * modifiers
+    * name
+    * not_aosp
+    * old_aosp
+    * ownership
+    * packageName
+    * qualifiedName
+    * rawType
+
+* Variable
+  * File
+  * called_times
+  * category
+  * commits_count
+  * entity_mapping
+  * global
+  * id
+  * intrusiveModify
+  * isIntrusive
+  * is_decoupling
+  * location
+  * modifiers
+  * name
+  * not_aosp
+  * old_aosp
+  * ownership
+  * packageName
+  * qualifiedName
+  * rawType
+
+* Method
+    * File
+    * called_times
+    * category
+    * commits_count
+    * entity_mapping
+    * id
+    * intrusiveModify
+    * isIntrusive
+    * is_decoupling
+    * location
+    * modifiers
+    * name
+    * not_aosp
+    * old_aosp
+    * ownership
+    * packageName
+    * parameterNames
+    * parameterTypes
+    * qualifiedName
+    * rawType
+
+* Class
+    * File
+    * called_times
+    * category
+    * commits_count
+    * entity_mapping
+    * id
+    * intrusiveModify
+    * isIntrusive
+    * is_decoupling
+    * location
+    * modifiers
+    * name
+    * not_aosp
+    * old_aosp
+    * ownership
+    * packageName
+    * qualifiedName
+    * rawType
+
+* Interface
+    * File
+    * called_times
+    * category
+    * commits_count
+    * entity_mapping
+    * id
+    * intrusiveModify
+    * isIntrusive
+    * is_decoupling
+    * location
+    * modifiers
+    * name
+    * not_aosp
+    * old_aosp
+    * ownership
+    * packageName
+    * qualifiedName
+    * rawType
+
+* File
+    * called_times
+    * category
+    * commits_count
+    * entity_mapping
+    * id
+    * isIntrusive
+    * is_decoupling
+    * name
+    * not_aosp
+    * old_aosp
+    * ownership
+    * packageName
+    * qualifiedName
+
+* Enum Constant
+    * File
+    * called_times
+    * category
+    * commits_count
+    * entity_mapping
+    * id
+    * isIntrusive
+    * is_decoupling
+    * name
+    * not_aosp
+    * old_aosp
+    * ownership
+    * packageName
+    * qualifiedName
+
+* Enum
+    * File
+    * called_times
+    * category
+    * commits_count
+    * entity_mapping
+    * id
+    * isIntrusive
+    * is_decoupling
+    * location
+    * modifiers
+    * name
+    * not_aosp
+    * old_aosp
+    * ownership
+    * packageName
+    * qualifiedName
+    * rawType
+
+* Package
+    * called_times
+    * category
+    * commits_count
+    * entity_mapping
+    * id
+    * isIntrusive
+    * is_decoupling
+    * name
+    * not_aosp
+    * old_aosp
+    * ownership
+    * qualifiedName
+
+* Base
+  * called_times
+  * category
+  * commits_count
+  * entity_mapping
+  * id
+  * isIntrusive
+  * is_decoupling
+  * name
+  * not_aosp
+  * old_aosp
+  * ownership
+  * qualifiedName

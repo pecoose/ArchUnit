@@ -18,12 +18,7 @@ package com.tngtech.archunit.core.importer;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.jar.JarFile;
 
 import com.google.common.collect.ImmutableList;
@@ -31,8 +26,9 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.tngtech.archunit.ArchConfiguration;
 import com.tngtech.archunit.PublicAPI;
-import com.tngtech.archunit.core.domain.JavaClass;
-import com.tngtech.archunit.core.domain.JavaClasses;
+import com.tngtech.archunit.core.domain.*;
+import com.tngtech.archunit.core.importer.enre.EnreEntityPO;
+import com.tngtech.archunit.core.importer.enre.EnreModel;
 import com.tngtech.archunit.core.importer.resolvers.ClassResolver;
 import com.tngtech.archunit.core.importer.resolvers.ClassResolverFromClasspath;
 import org.slf4j.Logger;
@@ -83,6 +79,7 @@ public final class ClassFileImporter {
     private static final Logger LOG = LoggerFactory.getLogger(ClassFileImporter.class);
 
     private final ImportOptions importOptions;
+    private final EnreModel enre = EnreJavaImporter.enre();
 
     @PublicAPI(usage = ACCESS)
     public ClassFileImporter() {
@@ -322,8 +319,54 @@ public final class ClassFileImporter {
         for (Location location : locations) {
             tryAdd(sources, location);
         }
-        return new ClassFileProcessor().process(unify(sources));
+        JavaClasses classes = new ClassFileProcessor().process(unify(sources));
+
+        Map<String, EnreEntityPO> entityQualifiedNameMap = new HashMap<>();
+        for (EnreEntityPO variable : enre.getVariables()) {
+            entityQualifiedNameMap.put(variable.getQualifiedName(), variable);
+        }
+        return mergeGraph(classes, entityQualifiedNameMap);
     }
+
+    private JavaOwnership getOwnership(String value) {
+        switch (value) {
+            case "extensive":
+                return JavaOwnership.EXTENSIVE;
+            case "activelyNative":
+                return JavaOwnership.ACTIVELY_NATIVE;
+            default:
+                System.out.println("unknown ownership " + value);
+                return null;
+        }
+    }
+
+    private JavaClasses mergeGraph(JavaClasses graph, Map<String, EnreEntityPO> map) {
+        int found = 0, notFound = 0;
+        for (JavaClass javaClass : graph) {
+            String fullName = javaClass.getFullName().replace("$", ".");
+
+            if (map.containsKey(fullName)) {
+                EnreEntityPO entity = map.get(fullName);
+                javaClass.setOwnership(getOwnership(entity.getOwnership()));
+                found++;
+            } else {
+                javaClass.setOwnership(JavaOwnership.ACTIVELY_NATIVE);
+                System.out.println("Not matched: " + javaClass.getFullName());
+                notFound++;
+            }
+
+            for (JavaMember member : javaClass.getMembers()) {
+                if (map.containsKey(member.getFullName())) {
+                    member.setOwnership(getOwnership(map.get(member.getFullName()).getOwnership()));
+                } else {
+                    member.setOwnership(JavaOwnership.ACTIVELY_NATIVE);
+                }
+            }
+        }
+        System.out.println("Matched: " + found + ", not matched: " + notFound);
+        return graph;
+    }
+
 
     private void tryAdd(List<ClassFileSource> sources, Location location) {
         try {

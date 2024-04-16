@@ -26,14 +26,8 @@ import com.google.common.collect.ImmutableSet;
 import com.tngtech.archunit.Internal;
 import com.tngtech.archunit.PublicAPI;
 import com.tngtech.archunit.base.DescribedPredicate;
-import com.tngtech.archunit.core.domain.properties.CanBeAnnotated;
-import com.tngtech.archunit.core.domain.properties.HasAnnotations;
-import com.tngtech.archunit.core.domain.properties.HasDescriptor;
-import com.tngtech.archunit.core.domain.properties.HasModifiers;
-import com.tngtech.archunit.core.domain.properties.HasName;
-import com.tngtech.archunit.core.domain.properties.HasOwner;
+import com.tngtech.archunit.core.domain.properties.*;
 import com.tngtech.archunit.core.domain.properties.HasOwner.Functions.Get;
-import com.tngtech.archunit.core.domain.properties.HasSourceCodeLocation;
 import com.tngtech.archunit.core.importer.DomainBuilders.JavaMemberBuilder;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -45,7 +39,7 @@ import static com.tngtech.archunit.core.domain.properties.HasType.Functions.GET_
 
 @PublicAPI(usage = ACCESS)
 public abstract class JavaMember implements
-        HasName.AndFullName, HasDescriptor, HasAnnotations<JavaMember>, HasModifiers, HasOwner<JavaClass>, HasSourceCodeLocation {
+        HasName.AndFullName, HasDescriptor, HasAnnotations<JavaMember>, HasModifiers, HasOwner<JavaClass>, HasSourceCodeLocation, HasOwnership {
 
     private final String name;
     private final String descriptor;
@@ -53,6 +47,7 @@ public abstract class JavaMember implements
     private final JavaClass owner;
     private final SourceCodeLocation sourceCodeLocation;
     private final Set<JavaModifier> modifiers;
+    private JavaOwnership ownership;
     private ReverseDependencies reverseDependencies = ReverseDependencies.EMPTY;
 
     JavaMember(JavaMemberBuilder<?, ?> builder) {
@@ -239,5 +234,14 @@ public abstract class JavaMember implements
                     .as("declared in %s", predicate.getDescription())
                     .forSubtype();
         }
+    }
+
+    @Override
+    public JavaOwnership getOwnership() {
+        return this.ownership;
+    }
+
+    public void setOwnership(JavaOwnership ownership) {
+        this.ownership = ownership;
     }
 }

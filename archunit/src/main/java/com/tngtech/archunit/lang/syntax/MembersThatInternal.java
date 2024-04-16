@@ -56,6 +56,16 @@ class MembersThatInternal<
     }
 
     @Override
+    public CONJUNCTION areActivelyNative() {
+        return givenWith(SyntaxPredicates.areActivelyNative());
+    }
+
+    @Override
+    public CONJUNCTION areExtensive() {
+        return givenWith(SyntaxPredicates.areExtensive());
+    }
+
+    @Override
     public CONJUNCTION haveName(String name) {
         return givenWith(have(name(name)));
     }
